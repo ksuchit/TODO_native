@@ -2,12 +2,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
 import { Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import TodoList from "./TodoList";
+import { useNavigation } from "@react-navigation/native";
 
 function Todo() {
   const [title, setTitle] = useState("");
   const [details, setDetails] = useState("");
   const [task, setTask] = useState([]);
-  const [update,setUpdate]=useState({})
+  const [update,setUpdate]=useState(-1)
+  const [user,setUser]=useState()
+  const navigation=useNavigation()
 
   const getData = async () => {
     try {
@@ -19,9 +22,17 @@ function Todo() {
     }
   };
 
+  const getUserFromStorage = async () => {
+    const user = await AsyncStorage.getItem("@user")
+    setUser(JSON.parse(user))
+  }
+
   useEffect(() => {
-     getData();
+    getData();
+    getUserFromStorage();
   }, []);
+
+  console.log("user",user)
 
   const storeData = async (value) => {
     try {
@@ -49,33 +60,32 @@ function Todo() {
         },
       ]);
 
-      try {
-        await AsyncStorage.setItem(
-          "todo",
-          JSON.stringify({ item: "sk", detail: "vhdsj" })
-        );
-      } catch (error) {
-        console.log("asyncStorage error", error);
-      }
     } else {
       Alert.alert("Warning", "Title or Details field is Empty");
     }
   };
 
-  const onDelete = (title) => {
-    setTask(task.filter((data) => title !== data.title))
+  const onDelete = (index) => {
+    setTask(task.filter((data,i) => index !== i))
     Alert.alert("Success","Successfully deleted")
   }
 
-  const onUpdate = (data) => {
-    console.log(data)
-    setUpdate(data)
+  const onUpdate = (index) => {
+    setUpdate(index)
   }
 
   return (
     <ScrollView style={{height:"90%"}}>
-    <View style={styles.container}>
-      <Text style={styles.heading}>Welcome to To-do</Text>
+      <View style={styles.container}>
+        <View style={styles.head}>
+          <Text style={styles.heading}>Welcome to To-do</Text>
+          <Button title="Signout"
+            onPress={async() => {
+              await AsyncStorage.removeItem("@user")
+              navigation.navigate("Login")
+            }}
+          />
+        </View>
       <Text style={styles.inputTitle}>Title</Text>
       <TextInput
         type="text"
@@ -97,36 +107,34 @@ function Todo() {
       <Button onPress={addTodo} title="Add Task" style={styles.btn} />
 
         <View style={styles.taskContainer}>
-        {task?.map((data) => (
-          (data.title === update.title)
+        {task?.map((data,index) => (
+          (index === update)
             
           ?
 
           <>
             <Text style={styles.inputTitle}>Title</Text>
-      <TextInput
-        type="text"
-        placeholder="Enter heading"
-        style={styles.inputField}
-        defaultValue={data.title}
-        onChangeText={(newText) => setTitle(newText)}
-      />
-      <Text style={styles.inputTitle}>Task Details</Text>
-      <TextInput
-        multiline={true}
-        numberOfLines={4}
-        placeholder="Task Details"
-        style={styles.inputField}
-        defaultValue={data.details}
-        onChangeText={(newText) => setDetails(newText)}
-      />
+            <TextInput
+              type="text"
+              placeholder="Enter heading"
+              style={styles.inputField}
+              defaultValue={data.title}
+              onChangeText={(newText) => setTitle(newText)}
+            />
+            <Text style={styles.inputTitle}>Task Details</Text>
+            <TextInput
+              multiline={true}
+              numberOfLines={4}
+              placeholder="Task Details"
+              style={styles.inputField}
+              defaultValue={data.details}
+              onChangeText={(newText) => setDetails(newText)}
+            />
 
               <Button
                 onPress={() => {
-                  setTask((prev) => prev.map((upItem) => {
-                    console.log("update want to")
-                    if (upItem.title === update.title) {
-                    console.log("update want to")
+                  setTask((prev) => prev.map((upItem,index) => {
+                    if (index === update) {
                     upItem.title = title
                     upItem.details=details
                   }
@@ -142,7 +150,7 @@ function Todo() {
             </>
         :
         
-          <View style={styles.task} key={data.title}>
+          <View style={styles.task} key={index}>
             <Text style={styles.inputTitle}>{data.title}</Text>
             <View
               style={{
@@ -155,11 +163,11 @@ function Todo() {
             <View style={{ display: "flex", flexDirection: 'row', gap: 5 }}>
               <Button
                 title="UPDATE"
-                onPress={() => onUpdate(data)}
+                onPress={() => onUpdate(index)}
               />
               <Button
                 title="DELETE"
-                onPress={() => onDelete(data.title)}
+                onPress={() => onDelete(index)}
               />
             </View>
           </View>
@@ -178,6 +186,12 @@ const styles = StyleSheet.create({
     borderColor: "grey",
     borderRadius: 10,
     padding: 25,
+  },
+  head: {
+    display: "flex",
+    alignItems: "center",
+    flexDirection:"row",
+    justifyContent:'space-between'
   },
   heading: {
     fontSize: 25,
@@ -211,7 +225,7 @@ const styles = StyleSheet.create({
   },
   taskContainer: {
     display: "flex",
-    flexDirection: "row",
+    // flexDirection: "row",
     flexWrap: "wrap",
     borderWidth: 2,
     borderRadius: 10,
@@ -226,6 +240,7 @@ const styles = StyleSheet.create({
     margin: 5,
     borderRadius: 5,
   },
+ 
 });
 
 export default Todo;
