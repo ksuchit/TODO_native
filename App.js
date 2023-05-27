@@ -15,11 +15,13 @@ const Stack = createNativeStackNavigator()
 function MyStack() {
   return (
     <Stack.Navigator
-      initialRouteName="Signup"
+      initialRouteName="Login"
       screenOptions={{
         headerTitleAlign: 'center',
         headerStyle: {
+          marginTop:15,
           backgroundColor: '#3740FE',
+          backgroundImage:"",
         },
         headerTintColor: '#fff',
         headerTitleStyle: {

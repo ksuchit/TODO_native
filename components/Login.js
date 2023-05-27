@@ -16,13 +16,17 @@ function Login() {
     console.log("email",  email);
     console.log("password",  password);
     // setSubmit(true);
-    const user = await AsyncStorage.getItem("@user")
-    console.log("user", JSON.parse(user))
+    try {
+      const user = await AsyncStorage.getItem("@user")
+      console.log("user", JSON.parse(user))
+      if(JSON.parse(user).email===email && JSON.parse(user).password===password)
+        navigation.navigate('Todo')
+      else
+        Alert.alert("Failed", "Email or password does not match")
+    } catch (error) {
+      
+    }
 
-    if(JSON.parse(user).email===email && JSON.parse(user).password===password)
-      navigation.navigate('Todo')
-    else
-      Alert.alert("FAiled", "Email or password does not match")
   };
 
   return (

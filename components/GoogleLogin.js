@@ -6,7 +6,7 @@ import * as WebBrowser from "expo-web-browser";
 import * as Google from "expo-auth-session/providers/google";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import { Button, Text, View } from "react-native";
+import { Button, Image, Text, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 
 WebBrowser.maybeCompleteAuthSession();
@@ -63,10 +63,11 @@ function GoogleLogin() {
               title="Sign in with Google"
               onPress={promptAsyn}
           />
-          {/* <Button
-              title="delete local storage"
-              onPress={()=>AsyncStorage.removeItem("@user")}
-          /> */}
+          <View>
+        <Image
+          source={require('../assets/Google__Logo.png')}
+        />
+          </View>
     </View>
   );
 }
