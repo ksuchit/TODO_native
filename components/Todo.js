@@ -1,6 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import React, { useEffect, useState } from "react";
-import { Alert, Button, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
+import { Alert, Button, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import TodoList from "./TodoList";
 import { useNavigation } from "@react-navigation/native";
 
@@ -32,7 +32,8 @@ function Todo() {
     getUserFromStorage();
   }, []);
 
-  console.log("user",user)
+  console.log("user", user)
+  console.log(new Date)
 
   const storeData = async (value) => {
     try {
@@ -52,17 +53,34 @@ function Todo() {
     console.log("taskdata", details);
     if (title && details) {
       Alert.alert("Success", "New Task Added");
-      setTask((item) => [
-        ...item,
-        {
-          title: title,
-          details: details,
-        },
-      ]);
+      if (task?.length > 0) {
+        setTask((item) => [
+          ...item,
+          {
+            title: title,
+            details: details,
+            // time:new Date()
+          },
+        ]);
+      }
+      else {
+        setTask(() => [
+          {
+            title: title,
+            details: details,
+            // time: new Date()
+          },
+        ]);
+      }
+      
 
     } else {
       Alert.alert("Warning", "Title or Details field is Empty");
     }
+
+    //refresh your user inputs
+    setTitle("")
+    setDetails("")
   };
 
   const onDelete = (index) => {
@@ -70,8 +88,10 @@ function Todo() {
     Alert.alert("Success","Successfully deleted")
   }
 
-  const onUpdate = (index) => {
+  const onUpdate = (index,data) => {
     setUpdate(index)
+    setDetails(data.details)
+    setTitle(data.title)
   }
 
   return (
@@ -81,7 +101,7 @@ function Todo() {
           <Text style={styles.heading}>Welcome to To-do</Text>
           <Button title="Signout"
             onPress={async() => {
-              await AsyncStorage.removeItem("@user")
+              await AsyncStorage.clear()
               navigation.navigate("Login")
             }}
           />
@@ -142,6 +162,8 @@ function Todo() {
                   }))
 
                   setUpdate("")
+                  setDetails("")
+                  setTitle("")
 
                   Alert.alert("Success","Successfully Updated")
                 }}
@@ -150,8 +172,10 @@ function Todo() {
             </>
         :
         
+        task?.length > 0 ?
           <View style={styles.task} key={index}>
-            <Text style={styles.inputTitle}>{data.title}</Text>
+                <Text style={styles.inputTitle}>{data.title}</Text>
+                <Text>{data.time}</Text>
             <View
               style={{
                 borderBottomColor: "black",
@@ -159,19 +183,19 @@ function Todo() {
                 borderBottomWidth: StyleSheet.hairlineWidth,
               }}
             />
-            <Text style={{ marginTop: 5 }}>{data.details}</Text>
-            <View style={{ display: "flex", flexDirection: 'row', gap: 5 }}>
+            <Text style={{ marginTop: 5 ,marginBottom:10}}>{data.details}</Text>
+            <View style={{ display: "flex", flexDirection: 'row', gap: 5}}>
               <Button
                 title="UPDATE"
-                onPress={() => onUpdate(index)}
+                onPress={() => onUpdate(index,data)}
               />
               <Button
                 title="DELETE"
                 onPress={() => onDelete(index)}
-              />
+                  />
             </View>
           </View>
-        
+        : <View><Text>No Task Added</Text></View>
         ))}
         </View>
       {/* <TodoList /> */}
@@ -218,17 +242,19 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     paddingVertical: 12,
-    paddingHorizontal: 32,
+    paddingHorizontal: 12,
+    color:'white',
     borderRadius: 4,
     elevation: 3,
-    backgroundColor: "black",
+    backgroundColor: "#2196F3",
+    cursor:'pointer'
   },
   taskContainer: {
     display: "flex",
     // flexDirection: "row",
     flexWrap: "wrap",
-    borderWidth: 2,
-    borderRadius: 10,
+    // borderWidth: 2,
+    // borderRadius: 10,
     padding: 5,
     marginTop: 5,
   },
@@ -237,8 +263,9 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: "thistle",
     padding: 10,
-    margin: 5,
+    marginTop: 5,
     borderRadius: 5,
+    width:310
   },
  
 });

@@ -27,6 +27,9 @@ function Login() {
       
     }
 
+    //refresh the User Inputs
+    setEmail("")
+    setPassword("")
   };
 
   return (
@@ -96,6 +99,7 @@ const styles = StyleSheet.create({
     color: "blue",
     marginTop: 10,
     fontWeight: "bold",
+    marginBottom:30
   },
   errorText: {
     color: "red",

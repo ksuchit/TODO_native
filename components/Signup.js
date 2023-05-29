@@ -18,7 +18,8 @@ function Signup() {
   }
   useEffect(() => {
     isAlredyThere()
-  },[])
+  }, [])
+  
   const onSubmit = () => {
       console.log("onSubmit");
     setSubmit(true)
@@ -27,6 +28,12 @@ function Signup() {
       Alert.alert("success", "registered")
       navigation.navigate("Login")
     }
+
+    //refresh the users Input
+    setEmail("")
+    setName("")
+    setPassword("")
+
   };
 
   return (
