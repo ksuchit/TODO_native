@@ -2,4 +2,4 @@
 
 
 Its gives error while building apk.rather than it everything is working.
-you can refer todo-appW Repo
+you can refer Todo_App-native Repo
